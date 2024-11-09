@@ -24,9 +24,9 @@ class Image {
 public:
     explicit Image(const std::string& path);
 
-    Image(size_t width, size_t height, const Color& color);
+    Image(int width, int height, const Color& color);
 
-    void set(size_t x, size_t y, const Color& color);
+    void set(int x, int y, const Color& color);
 
     void write(const std::string& path);
 
