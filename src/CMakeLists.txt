@@ -7,3 +7,12 @@ add_library(image
         SHARED
         Image.h
         Image.cpp)
+find_package(OpenCV CONFIG REQUIRED)
+
+if (OpenCV_FOUND)
+    include_directories(${OpenCV_INCLUDE_DIRS})
+
+    link_directories(${OpenCV_LIB_DIR})
+
+    target_link_libraries(image PUBLIC ${OpenCV_LIBS})
+endif ()
