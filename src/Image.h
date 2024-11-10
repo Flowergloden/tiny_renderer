@@ -14,9 +14,8 @@ struct Color {
     uint8_t r;
     uint8_t g;
     uint8_t b;
-    uint8_t a;
 
-    Color(const uint8_t r, const uint8_t g, const uint8_t b, const uint8_t a) : r(r), g(g), b(b), a(a) {
+    Color(const uint8_t r, const uint8_t g, const uint8_t b) : r(r), g(g), b(b) {
     }
 };
 
@@ -32,6 +31,8 @@ public:
 
 private:
     cv::Mat image{};
+    int width;
+    int height;
 };
 
 #endif //IMAGE_H

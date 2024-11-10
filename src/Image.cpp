@@ -5,15 +5,18 @@
 
 Image::Image(const std::string& path) {
     image = imread(path, cv::IMREAD_COLOR);
+    width = image.cols;
+    height = image.rows;
 }
 
 Image::Image(const int width, const int height, const Color& color) {
-    image = cv::Mat(width, height, CV_8UC4, cv::Scalar(color.b, color.g, color.r, color.a));
+    image = cv::Mat(width, height, CV_8UC3, cv::Scalar(color.b, color.g, color.r));
+    this->width = width;
+    this->height = height;
 }
 
-void Image::set(int x, int y, const Color& color) {
-    // TODO: Not implemented
-    return;
+void Image::set(const int x, const int y, const Color& color) {
+    image.at<cv::Vec3b>(y, x) = cv::Vec3b(color.b, color.g, color.r);
 }
 
 void Image::write(const std::string& path) {

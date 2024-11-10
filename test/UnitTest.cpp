@@ -7,6 +7,7 @@
 int main() {
     // Image img(128, 128, Color(255, 0, 0, 255));
     Image img("test2.png");
+    img.set(0, 0, Color(255, 0, 0));
     img.write("test3.png");
 
     return 0;
