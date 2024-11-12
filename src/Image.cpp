@@ -5,14 +5,14 @@
 
 Image::Image(const std::string& path) {
     image = imread(path, cv::IMREAD_COLOR);
-    width = image.cols;
-    height = image.rows;
+    _width = image.cols;
+    _height = image.rows;
 }
 
 Image::Image(const int width, const int height, const Color& color) {
     image = cv::Mat(width, height, CV_8UC3, cv::Scalar(color.b, color.g, color.r));
-    this->width = width;
-    this->height = height;
+    this->_width = width;
+    this->_height = height;
 }
 
 void Image::set(const int x, const int y, const Color& color) {
@@ -34,6 +34,12 @@ void Image::line(int x0, int y0, int x1, int y1, const Color& color) {
         std::swap(x0, x1);
         std::swap(y0, y1);
     }
+
+    // TODO: fix edge case when at same point
+    // TODO: transact point to starting from left-bottom
+    if (x0 == x1) ++x1;
+    if (y0 == y1) ++y1;
+
     for (int x = x0; x <= x1; ++x) {
         const float t = static_cast<float>(x - x0) / static_cast<float>(x1 - x0);
         const int y = static_cast<int>(static_cast<float>(y0) + static_cast<float>(y1 - y0) * t);

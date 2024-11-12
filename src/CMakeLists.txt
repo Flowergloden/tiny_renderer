@@ -16,3 +16,8 @@ if (OpenCV_FOUND)
 
     target_link_libraries(image PUBLIC ${OpenCV_LIBS})
 endif ()
+
+find_package(tinyobjloader CONFIG REQUIRED)
+if (tinyobjloader_FOUND)
+    target_link_libraries(image PUBLIC tinyobjloader::tinyobjloader)
+endif ()

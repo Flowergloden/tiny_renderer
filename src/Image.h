@@ -31,10 +31,14 @@ public:
 
     void line(int x0, int y0, int x1, int y1, const Color& color);
 
+    [[nodiscard]] int width() const { return _width; }
+
+    [[nodiscard]] int height() const { return _height; }
+
 private:
     cv::Mat image{};
-    int width;
-    int height;
+    int _width;
+    int _height;
 };
 
 #endif //IMAGE_H
