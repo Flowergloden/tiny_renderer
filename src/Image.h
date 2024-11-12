@@ -27,7 +27,9 @@ public:
 
     void set(int x, int y, const Color& color);
 
-    void write(const std::string& path);
+    void write(const std::string& path) const;
+
+    void line(int x0, int y0, int x1, int y1, const Color& color);
 
 private:
     cv::Mat image{};
