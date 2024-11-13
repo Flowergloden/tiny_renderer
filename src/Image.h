@@ -29,7 +29,7 @@ public:
 
     void write(const std::string& path) const;
 
-    void line(int x0, int y0, int x1, int y1, const Color& color);
+    void line(int x0, int y0, int x1, int y1, const Color& color, bool flip = true);
 
     [[nodiscard]] int width() const { return _width; }
 

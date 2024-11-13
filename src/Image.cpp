@@ -23,7 +23,7 @@ void Image::write(const std::string& path) const {
     imwrite(path, image);
 }
 
-void Image::line(int x0, int y0, int x1, int y1, const Color& color) {
+void Image::line(int x0, int y0, int x1, int y1, const Color& color, const bool flip) {
     bool steep = false;
     if (abs(x1 - x0) < abs(y1 - y0)) {
         std::swap(x0, y0);
@@ -35,18 +35,18 @@ void Image::line(int x0, int y0, int x1, int y1, const Color& color) {
         std::swap(y0, y1);
     }
 
-    // TODO: fix edge case when at same point
-    // TODO: transact point to starting from left-bottom
-    if (x0 == x1) ++x1;
-    if (y0 == y1) ++y1;
-
     for (int x = x0; x <= x1; ++x) {
-        const float t = static_cast<float>(x - x0) / static_cast<float>(x1 - x0);
-        const int y = static_cast<int>(static_cast<float>(y0) + static_cast<float>(y1 - y0) * t);
-        if (steep) {
-            set(y, x, color);
+        int y;
+        if (x1 - x0 == 0) {
+            y = y0;
         } else {
-            set(x, y, color);
+            const float t = static_cast<float>(x - x0) / static_cast<float>(x1 - x0);
+            y = static_cast<int>(static_cast<float>(y0) + static_cast<float>(y1 - y0) * t);
+        }
+        if (steep) {
+            set(y, flip ? _height - 1 - x : x, color);
+        } else {
+            set(x, flip ? _height - 1 - y : y, color);
         }
     }
 }
