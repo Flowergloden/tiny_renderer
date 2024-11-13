@@ -3,6 +3,11 @@ project(tiny_renderer)
 
 set(CMAKE_CXX_STANDARD 20)
 
+add_library(renderer
+        SHARED
+        Renderer.h
+        Renderer.cpp)
+
 add_library(image
         SHARED
         Image.h
@@ -21,3 +26,5 @@ find_package(tinyobjloader CONFIG REQUIRED)
 if (tinyobjloader_FOUND)
     target_link_libraries(image PUBLIC tinyobjloader::tinyobjloader)
 endif ()
+
+target_link_libraries(renderer PUBLIC image)

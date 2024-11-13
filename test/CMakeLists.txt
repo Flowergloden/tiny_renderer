@@ -8,7 +8,7 @@ add_executable(unit_test
 
 target_link_libraries(unit_test
         PUBLIC
-        image)
+        renderer)
 
 target_include_directories(unit_test
         PUBLIC
