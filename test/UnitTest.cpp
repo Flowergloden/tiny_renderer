@@ -18,7 +18,7 @@ int main() {
 
     lineImg.write("line_test.png");
 
-    Image meshImg(1024, 1024, Color(0, 0, 0));
+    Image meshImg(4096, 4096, Color(0, 0, 0));
 
     if (auto reader = tinyobj::ObjReader(); reader.ParseFromFile("african_head.obj")) {
         const auto& attrib = reader.GetAttrib();
@@ -35,11 +35,11 @@ int main() {
                 const float u1 = attrib.vertices[3 * indices[index + (j + 1) % sum].vertex_index + 0];
                 const float v1 = attrib.vertices[3 * indices[index + (j + 1) % sum].vertex_index + 1];
 
-                const int x0 = static_cast<int>((u0 + 1.) * meshImg.width() / 2);
-                const int y0 = static_cast<int>((v0 + 1.) * meshImg.height() / 2);
+                const int x0 = static_cast<int>((u0 + 1.) * (meshImg.width() - 1.) / 2);
+                const int y0 = static_cast<int>((v0 + 1.) * (meshImg.height() - 1.) / 2);
 
-                const int x1 = static_cast<int>((u1 + 1.) * meshImg.width() / 2);
-                const int y1 = static_cast<int>((v1 + 1.) * meshImg.height() / 2);
+                const int x1 = static_cast<int>((u1 + 1.) * (meshImg.width() - 1.) / 2);
+                const int y1 = static_cast<int>((v1 + 1.) * (meshImg.height() - 1.) / 2);
                 meshImg.line(x0, y0, x1, y1, Color(255, 255, 255));
             }
 
