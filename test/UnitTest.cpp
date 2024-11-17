@@ -22,12 +22,12 @@ int main() {
     Renderer renderer(4096, 4096);
     renderer.run("african_head.obj");
 
-    Triangle triangle{cv::Vec3i{0, 0, 0}, cv::Vec3i{1, 0, 0}, cv::Vec3i{0, 1, 0}};
+    Triangle triangle{cv::Vec3i{0, 0, 0}, cv::Vec3i{0, 10, 0}, cv::Vec3i{10, 0, 0}};
 
     std::cout << "min: " << triangle.get_bounding_box()[0][0] << ", " << triangle.get_bounding_box()[0][1] << std::endl;
     std::cout << "max: " << triangle.get_bounding_box()[1][0] << ", " << triangle.get_bounding_box()[1][1] << std::endl;
 
-    cv::Vec2i p{1, 1};
+    cv::Vec2i p{5, 5};
     std::cout << "p: " << p[0] << ", " << p[1] << std::endl;
     std::cout << "barycentric: " << triangle.barycentric(p)[0] << ", " << triangle.barycentric(p)[1] << ", " << triangle
             .barycentric(p)[2] << std::endl;

@@ -34,6 +34,6 @@ cv::Vec3f Triangle::barycentric(const cv::Vec2i& p) {
                 static_cast<float>(points[0][1] - p[1])
             });
 
-    if (std::abs(u[2] < 1))return cv::Vec3f{-1, 1, 1};
+    if (std::abs(u[2]) < 1)return cv::Vec3f{-1, 1, 1};
     return cv::Vec3f{1 - (u[0] + u[1]) / u[2], u[1] / u[2], u[0] / u[2]};
 }
