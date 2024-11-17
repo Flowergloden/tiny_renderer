@@ -27,4 +27,9 @@ if (tinyobjloader_FOUND)
     target_link_libraries(image PUBLIC tinyobjloader::tinyobjloader)
 endif ()
 
-target_link_libraries(renderer PUBLIC image)
+add_library(triangle
+        SHARED
+        Triangle.cpp
+        Triangle.h)
+
+target_link_libraries(renderer PUBLIC image triangle)

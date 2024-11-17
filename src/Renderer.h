@@ -7,6 +7,7 @@
 
 #include <tiny_obj_loader.h>
 #include "Image.h"
+#include "Triangle.h"
 
 class Renderer {
 public:
