@@ -7,20 +7,28 @@
 
 #include <tiny_obj_loader.h>
 #include "Image.h"
-#include "Triangle.h"
+#include "Model.h"
 
 class Renderer {
 public:
-    Renderer(const int width, const int height): img(width, height, Color(0, 0, 0)) {
+    Renderer(const int width, const int height, const std::string& path): model(path),
+                                                                          img(width, height, Color(0, 0, 0)) {
     }
 
-    void run(const std::string& path);
+    void run();
+
+    [[nodiscard]] cv::Vec3i world_to_screen(const cv::Vec3f& v) const;
+
+    [[nodiscard]] cv::Vec3f screen_to_world(const cv::Vec3i& v) const;
 
 private:
-    tinyobj::ObjReader obj;
+    Model model;
     Image img;
+    const int screen_depth = 10;
 
     void draw_edge();
+
+    void draw_triangle();
 };
 
 

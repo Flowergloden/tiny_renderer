@@ -19,8 +19,8 @@ int main() {
 
     lineImg.write("line_test.png");
 
-    Renderer renderer(4096, 4096);
-    renderer.run("african_head.obj");
+    Renderer renderer(4096, 4096, "african_head.obj");
+    renderer.run();
 
     Triangle triangle{cv::Vec3i{0, 0, 0}, cv::Vec3i{0, 10, 0}, cv::Vec3i{10, 0, 0}};
 

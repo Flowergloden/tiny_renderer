@@ -10,19 +10,19 @@
 
 class Triangle {
 public:
-    Triangle(const cv::Vec3i& p0, const cv::Vec3i& p1, const cv::Vec3i& p2) {
+    Triangle(const cv::Vec3f& p0, const cv::Vec3f& p1, const cv::Vec3f& p2) {
         points[0] = p0;
         points[1] = p1;
         points[2] = p2;
     }
 
-    const std::array<cv::Vec2i, 2>& get_bounding_box();
+    const std::array<cv::Vec2f, 2>& get_bounding_box();
 
-    cv::Vec3f barycentric(const cv::Vec2i& p);
+    cv::Vec3f barycentric(const cv::Vec2f& p);
 
 private:
-    std::array<cv::Vec3i, 3> points{};
-    std::array<cv::Vec2i, 2> bbox;
+    std::array<cv::Vec3f, 3> points{};
+    std::array<cv::Vec2f, 2> bbox;
 
     bool data_changed = true;
 };

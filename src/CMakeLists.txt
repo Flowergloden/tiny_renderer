@@ -14,6 +14,10 @@ add_library(image
         Image.cpp)
 find_package(OpenCV CONFIG REQUIRED)
 
+add_library(triangle SHARED Triangle.cpp Triangle.h)
+
+add_library(model Model.cpp Model.h)
+
 if (OpenCV_FOUND)
     include_directories(${OpenCV_INCLUDE_DIRS})
 
@@ -24,12 +28,9 @@ endif ()
 
 find_package(tinyobjloader CONFIG REQUIRED)
 if (tinyobjloader_FOUND)
-    target_link_libraries(image PUBLIC tinyobjloader::tinyobjloader)
+    target_link_libraries(model PUBLIC tinyobjloader::tinyobjloader)
 endif ()
 
-add_library(triangle
-        SHARED
-        Triangle.cpp
-        Triangle.h)
+target_link_libraries(model PUBLIC triangle)
 
-target_link_libraries(renderer PUBLIC image triangle)
+target_link_libraries(renderer PUBLIC image model)
