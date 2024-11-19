@@ -26,7 +26,7 @@ Model::Model(const std::string& path) {
             });
         }
 
-        for (int i = 0; i < mesh.num_face_vertices.size(); ++i) {
+        for (int i = 0, index = 0; i < mesh.num_face_vertices.size(); ++i) {
             const int sum = static_cast<int>(mesh.num_face_vertices[i]);
 
             // TODO: deal with non-triangle faces
@@ -34,9 +34,9 @@ Model::Model(const std::string& path) {
                 std::cerr << "Object " << name << " has non-triangle faces" << std::endl;
             }
 
-            std::vector<int> vertices;
+            std::vector<int> vertices{};
             for (int j = 0; j < sum; ++j) {
-                vertices.push_back(3 * mesh.indices[i + j].vertex_index);
+                vertices.push_back(3 * mesh.indices[index + j].vertex_index);
             }
             object.triangles.emplace_back(
                 cv::Vec3f{
@@ -55,6 +55,8 @@ Model::Model(const std::string& path) {
                     attribute.vertices[vertices[2] + 2]
                 }
             );
+
+            index += sum;
         }
 
         objects.push_back(object);

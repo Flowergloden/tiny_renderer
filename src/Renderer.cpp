@@ -6,8 +6,8 @@
 #include <random>
 
 void Renderer::run() {
-    draw_edge();
-    // draw_triangle();
+    // draw_edge();
+    draw_triangle();
 
     img.write("output.png");
 }
