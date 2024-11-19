@@ -20,6 +20,8 @@ public:
 
     cv::Vec3f barycentric(const cv::Vec2f& p);
 
+    [[nodiscard]] const std::array<cv::Vec3f, 3>& get_points() const { return points; }
+
 private:
     std::array<cv::Vec3f, 3> points{};
     std::array<cv::Vec2f, 2> bbox;

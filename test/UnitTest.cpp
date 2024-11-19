@@ -20,14 +20,16 @@ int main() {
     lineImg.write("line_test.png");
 
     Renderer renderer(4096, 4096, "african_head.obj");
+    // Renderer renderer(1024, 1024, "box.obj");
+    // Renderer renderer(10, 10, "floor.obj");
     renderer.run();
 
-    Triangle triangle{cv::Vec3i{0, 0, 0}, cv::Vec3i{0, 10, 0}, cv::Vec3i{10, 0, 0}};
+    Triangle triangle{cv::Vec3i{-1, -1, 0}, cv::Vec3i{-1, 0, 0}, cv::Vec3i{0, -1, 0}};
 
     std::cout << "min: " << triangle.get_bounding_box()[0][0] << ", " << triangle.get_bounding_box()[0][1] << std::endl;
     std::cout << "max: " << triangle.get_bounding_box()[1][0] << ", " << triangle.get_bounding_box()[1][1] << std::endl;
 
-    cv::Vec2i p{5, 5};
+    cv::Vec2f p{-0.5, -0.5};
     std::cout << "p: " << p[0] << ", " << p[1] << std::endl;
     std::cout << "barycentric: " << triangle.barycentric(p)[0] << ", " << triangle.barycentric(p)[1] << ", " << triangle
             .barycentric(p)[2] << std::endl;
