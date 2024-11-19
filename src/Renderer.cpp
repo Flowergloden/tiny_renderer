@@ -3,7 +3,6 @@
 //
 
 #include "Renderer.h"
-#include <random>
 
 void Renderer::run() {
     // draw_edge();
@@ -43,15 +42,14 @@ void Renderer::draw_edge() {
 }
 
 void Renderer::draw_triangle() {
-    // TEST ONLY
-    std::mt19937 mt{
-        static_cast<std::mt19937::result_type>(std::chrono::steady_clock::now().time_since_epoch().count())
-    };
-
     for (auto& object: model.objects) {
         for (auto& triangle: object.triangles) {
-            // TEST ONLY
-            const Color color(mt() % 255, mt() % 255, mt() % 255);
+            cv::Vec3f n = normalize((triangle.get_points()[2] - triangle.get_points()[0]).cross(
+                triangle.get_points()[1] - triangle.get_points()[0]));
+            const float intensity = n.dot(light_dir);
+            if (intensity < 0) continue;
+            const Color color(static_cast<uint8_t>(intensity * 255), static_cast<uint8_t>(intensity * 255),
+                              static_cast<uint8_t>(intensity * 255));
 
             auto bbox = triangle.get_bounding_box();
             auto left_bottom = world_to_screen(cv::Vec3f{bbox[0][0], bbox[0][1], 0});
