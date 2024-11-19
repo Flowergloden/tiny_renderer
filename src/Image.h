@@ -25,11 +25,11 @@ public:
 
     Image(int width, int height, const Color& color);
 
-    void set(int x, int y, const Color& color);
+    void set(int x, int y, const Color& color, bool flip = true);
 
     void write(const std::string& path) const;
 
-    void line(int x0, int y0, int x1, int y1, const Color& color, bool flip = true);
+    void line(int x0, int y0, int x1, int y1, const Color& color);
 
     [[nodiscard]] int width() const { return _width; }
 

@@ -15,15 +15,15 @@ Image::Image(const int width, const int height, const Color& color) {
     this->_height = height;
 }
 
-void Image::set(const int x, const int y, const Color& color) {
-    image.at<cv::Vec3b>(y, x) = cv::Vec3b(color.b, color.g, color.r);
+void Image::set(const int x, const int y, const Color& color, bool flip) {
+    image.at<cv::Vec3b>(flip ? height() - 1 - y : y, x) = cv::Vec3b(color.b, color.g, color.r);
 }
 
 void Image::write(const std::string& path) const {
     imwrite(path, image);
 }
 
-void Image::line(int x0, int y0, int x1, int y1, const Color& color, const bool flip) {
+void Image::line(int x0, int y0, int x1, int y1, const Color& color) {
     bool steep = false;
     if (abs(x1 - x0) < abs(y1 - y0)) {
         std::swap(x0, y0);
@@ -44,9 +44,9 @@ void Image::line(int x0, int y0, int x1, int y1, const Color& color, const bool 
             y = static_cast<int>(static_cast<float>(y0) + static_cast<float>(y1 - y0) * t);
         }
         if (steep) {
-            set(y, flip ? _height - 1 - x : x, color);
+            set(y, x, color);
         } else {
-            set(x, flip ? _height - 1 - y : y, color);
+            set(x, y, color);
         }
     }
 }
