@@ -61,10 +61,18 @@ void Renderer::draw_triangle() {
                     if (y < 0 || y >= img.height()) { continue; }
 
                     auto p = screen_to_world(cv::Vec3i{x, y, 0});
-                    if (auto bc = triangle.barycentric(cv::Vec2f{p[0], p[1]}); bc[0] < 0 || bc[1] < 0 || bc[2] < 0) {
-                        continue;
+                    auto bc = triangle.barycentric(cv::Vec2f{p[0], p[1]});
+                    if (bc[0] < 0 || bc[1] < 0 || bc[2] < 0) { continue; }
+
+                    p[2] = 0;
+                    for (int i = 0; i < 3; ++i) {
+                        p[2] += triangle.get_points()[i][2] * bc[i];
                     }
-                    img.set(x, y, color);
+
+                    if (z_buffer[y][x] < p[2]) {
+                        z_buffer[y][x] = p[2];
+                        img.set(x, y, color);
+                    }
                 }
             }
         }
