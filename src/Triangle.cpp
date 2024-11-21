@@ -22,16 +22,22 @@ const std::array<cv::Vec2f, 2>& Triangle::get_bounding_box() {
     return bbox;
 }
 
-cv::Vec3f Triangle::barycentric(const cv::Vec2f& p) {
+cv::Vec3f Triangle::barycentric(const cv::Vec2f& p, const bool is_tex) const {
+    std::array<cv::Vec3f, 3> pts;
+    if (is_tex) {
+        pts = tex_coors;
+    } else {
+        pts = points;
+    }
     cv::Vec3f u = cv::Vec3f{
-                (points[2][0] - points[0][0]),
-                (points[1][0] - points[0][0]),
-                (points[0][0] - p[0])
+                (pts[2][0] - pts[0][0]),
+                (pts[1][0] - pts[0][0]),
+                (pts[0][0] - p[0])
             }
             .cross(cv::Vec3f{
-                (points[2][1] - points[0][1]),
-                (points[1][1] - points[0][1]),
-                (points[0][1] - p[1])
+                (pts[2][1] - pts[0][1]),
+                (pts[1][1] - pts[0][1]),
+                (pts[0][1] - p[1])
             });
 
     if (u[2] == 0)return cv::Vec3f{-1, 1, 1};

@@ -34,25 +34,41 @@ Model::Model(const std::string& path) {
                 std::cerr << "Object " << name << " has non-triangle faces" << std::endl;
             }
 
-            std::vector<int> vertices{};
+            std::vector<tinyobj::index_t> indices{};
             for (int j = 0; j < sum; ++j) {
-                vertices.push_back(3 * mesh.indices[index + j].vertex_index);
+                indices.push_back(mesh.indices[index + j]);
             }
             object.triangles.emplace_back(
                 cv::Vec3f{
-                    attribute.vertices[vertices[0] + 0],
-                    attribute.vertices[vertices[0] + 1],
-                    attribute.vertices[vertices[0] + 2]
+                    attribute.vertices[3 * indices[0].vertex_index + 0],
+                    attribute.vertices[3 * indices[0].vertex_index + 1],
+                    attribute.vertices[3 * indices[0].vertex_index + 2]
                 },
                 cv::Vec3f{
-                    attribute.vertices[vertices[1] + 0],
-                    attribute.vertices[vertices[1] + 1],
-                    attribute.vertices[vertices[1] + 2]
+                    attribute.vertices[3 * indices[1].vertex_index + 0],
+                    attribute.vertices[3 * indices[1].vertex_index + 1],
+                    attribute.vertices[3 * indices[1].vertex_index + 2]
                 },
                 cv::Vec3f{
-                    attribute.vertices[vertices[2] + 0],
-                    attribute.vertices[vertices[2] + 1],
-                    attribute.vertices[vertices[2] + 2]
+                    attribute.vertices[3 * indices[2].vertex_index + 0],
+                    attribute.vertices[3 * indices[2].vertex_index + 1],
+                    attribute.vertices[3 * indices[2].vertex_index + 2]
+                },
+
+                cv::Vec3f{
+                    attribute.texcoords[2 * indices[0].texcoord_index + 0],
+                    attribute.texcoords[2 * indices[0].texcoord_index + 1],
+                    0
+                },
+                cv::Vec3f{
+                    attribute.texcoords[2 * indices[1].texcoord_index + 0],
+                    attribute.texcoords[2 * indices[1].texcoord_index + 1],
+                    0
+                },
+                cv::Vec3f{
+                    attribute.texcoords[2 * indices[2].texcoord_index + 0],
+                    attribute.texcoords[2 * indices[2].texcoord_index + 1],
+                    0
                 }
             );
 

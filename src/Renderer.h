@@ -11,8 +11,10 @@
 
 class Renderer {
 public:
+    // TODO: use .mtl instead texture
     Renderer(const int width, const int height, const std::string& path): model(path),
-                                                                          img(width, height, Color(0, 0, 0)) {
+                                                                          img(width, height, Color(0, 0, 0)),
+                                                                          texture("african_head_diffuse.tga") {
         for (int i = 0; i < height; ++i) {
             z_buffer.emplace_back();
             for (int j = 0; j < width; ++j) {
@@ -33,6 +35,7 @@ private:
     std::vector<std::vector<float>> z_buffer{};
     const int screen_depth = 10;
     const cv::Vec3f light_dir = cv::Vec3f{0, 0, -1};
+    Image texture;
 
     void draw_edge();
 
