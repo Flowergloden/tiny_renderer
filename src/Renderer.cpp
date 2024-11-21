@@ -48,8 +48,6 @@ void Renderer::draw_triangle() {
                 triangle.get_points()[1] - triangle.get_points()[0]));
             const float intensity = n.dot(light_dir);
             if (intensity < 0) continue;
-            const Color color(static_cast<uint8_t>(intensity * 255), static_cast<uint8_t>(intensity * 255),
-                              static_cast<uint8_t>(intensity * 255));
 
             auto bbox = triangle.get_bounding_box();
             auto left_bottom = world_to_screen(cv::Vec3f{bbox[0][0], bbox[0][1], 0});
@@ -71,6 +69,16 @@ void Renderer::draw_triangle() {
 
                     if (z_buffer[y][x] < p[2]) {
                         z_buffer[y][x] = p[2];
+                        // auto tex_bc = triangle.barycentric(cv::Vec2f{p[0], p[1]}, true);
+                        const auto& tex_coors = triangle.get_tex_coors();
+                        cv::Vec3f uv = tex_coors[0] * bc[0] + tex_coors[1] * bc[1] + tex_coors[2] * bc[2];
+                        const auto tex_color = texture.get(
+                            static_cast<int>(uv[0] * static_cast<float>(texture.width())),
+                            static_cast<int>(uv[1] * static_cast<float>(texture.height())));
+
+                        const Color color(static_cast<uint8_t>(intensity * static_cast<float>(tex_color.r)),
+                                          static_cast<uint8_t>(intensity * static_cast<float>(tex_color.g)),
+                                          static_cast<uint8_t>(intensity * static_cast<float>(tex_color.b)));
                         img.set(x, y, color);
                     }
                 }

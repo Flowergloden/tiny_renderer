@@ -27,6 +27,8 @@ public:
 
     void set(int x, int y, const Color& color, bool flip = true);
 
+    Color get(int x, int y, bool flip = true);
+
     void write(const std::string& path) const;
 
     void line(int x0, int y0, int x1, int y1, const Color& color);

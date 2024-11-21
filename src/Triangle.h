@@ -23,9 +23,10 @@ public:
 
     const std::array<cv::Vec2f, 2>& get_bounding_box();
 
-    [[nodiscard]] cv::Vec3f barycentric(const cv::Vec2f& p, bool is_tex = false) const;
+    [[nodiscard]] cv::Vec3f barycentric(const cv::Vec2f& p) const;
 
     [[nodiscard]] const std::array<cv::Vec3f, 3>& get_points() const { return points; }
+    [[nodiscard]] const std::array<cv::Vec3f, 3>& get_tex_coors() const { return tex_coors; }
 
 private:
     std::array<cv::Vec3f, 3> points{};
