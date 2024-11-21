@@ -14,7 +14,7 @@ public:
     // TODO: use .mtl instead texture
     Renderer(const int width, const int height, const std::string& path): model(path),
                                                                           img(width, height, Color(0, 0, 0)),
-                                                                          texture("african_head_diffuse.tga") {
+                                                                          texture("african_head_diffuse.png") {
         for (int i = 0; i < height; ++i) {
             z_buffer.emplace_back();
             for (int j = 0; j < width; ++j) {
