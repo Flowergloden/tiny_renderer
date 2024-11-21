@@ -19,9 +19,8 @@ void Image::set(const int x, const int y, const Color& color, const bool flip) {
     image.at<cv::Vec3b>(flip ? height() - 1 - y : y, x) = cv::Vec3b(color.b, color.g, color.r);
 }
 
-Color Image::get(const int x, const int y, const bool flip) {
-    auto raw = image.at<cv::Vec3b>(flip ? height() - 1 - y : y, x);
-    return Color{raw[0], raw[1], raw[2]};
+cv::Vec3b Image::get(const int x, const int y, const bool flip) {
+    return image.at<cv::Vec3b>(flip ? height() - 1 - y : y, x);
 }
 
 void Image::write(const std::string& path) const {

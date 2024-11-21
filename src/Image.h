@@ -27,7 +27,7 @@ public:
 
     void set(int x, int y, const Color& color, bool flip = true);
 
-    Color get(int x, int y, bool flip = true);
+    cv::Vec3b get(int x, int y, bool flip = true);
 
     void write(const std::string& path) const;
 

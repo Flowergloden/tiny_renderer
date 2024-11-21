@@ -76,9 +76,9 @@ void Renderer::draw_triangle() {
                             static_cast<int>(uv[0] * static_cast<float>(texture.width())),
                             static_cast<int>(uv[1] * static_cast<float>(texture.height())));
 
-                        const Color color(static_cast<uint8_t>(intensity * static_cast<float>(tex_color.r)),
-                                          static_cast<uint8_t>(intensity * static_cast<float>(tex_color.g)),
-                                          static_cast<uint8_t>(intensity * static_cast<float>(tex_color.b)));
+                        const Color color(static_cast<uint8_t>(intensity * static_cast<float>(tex_color[2])),
+                                          static_cast<uint8_t>(intensity * static_cast<float>(tex_color[1])),
+                                          static_cast<uint8_t>(intensity * static_cast<float>(tex_color[0])));
                         img.set(x, y, color);
                     }
                 }
