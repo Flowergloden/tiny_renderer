@@ -58,10 +58,12 @@ void Renderer::draw_triangle() {
                 for (int y = left_bottom[1]; y <= right_top[1]; ++y) {
                     if (y < 0 || y >= img.height()) { continue; }
 
+                    // calculate barycentric coordinates with world positon
                     auto p = screen_to_world(cv::Vec3i{x, y, 0});
                     auto bc = triangle.barycentric(cv::Vec2f{p[0], p[1]});
                     if (bc[0] < 0 || bc[1] < 0 || bc[2] < 0) { continue; }
 
+                    // calculate z value used by z-buffer
                     p[2] = 0;
                     for (int i = 0; i < 3; ++i) {
                         p[2] += triangle.get_points()[i][2] * bc[i];
@@ -69,7 +71,7 @@ void Renderer::draw_triangle() {
 
                     if (z_buffer[y][x] < p[2]) {
                         z_buffer[y][x] = p[2];
-                        // auto tex_bc = triangle.barycentric(cv::Vec2f{p[0], p[1]}, true);
+                        // interpolation uv
                         const auto& tex_coors = triangle.get_tex_coors();
                         cv::Vec3f uv = tex_coors[0] * bc[0] + tex_coors[1] * bc[1] + tex_coors[2] * bc[2];
                         const auto tex_color = texture.get(
