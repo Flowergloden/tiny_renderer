@@ -34,7 +34,7 @@ private:
     Image img;
     std::vector<std::vector<float>> z_buffer{};
     const int screen_depth = 10;
-    const cv::Vec3f light_dir = cv::Vec3f{0, 0, -1};
+    const cv::Vec3f light_dir = cv::Vec3f{1, 1, 1};
     Image texture;
 
     // TODO: replace this with complete camera def

@@ -39,36 +39,58 @@ Model::Model(const std::string& path) {
                 indices.push_back(mesh.indices[index + j]);
             }
             object.triangles.emplace_back(
-                cv::Vec3f{
-                    attribute.vertices[3 * indices[0].vertex_index + 0],
-                    attribute.vertices[3 * indices[0].vertex_index + 1],
-                    attribute.vertices[3 * indices[0].vertex_index + 2]
-                },
-                cv::Vec3f{
-                    attribute.vertices[3 * indices[1].vertex_index + 0],
-                    attribute.vertices[3 * indices[1].vertex_index + 1],
-                    attribute.vertices[3 * indices[1].vertex_index + 2]
-                },
-                cv::Vec3f{
-                    attribute.vertices[3 * indices[2].vertex_index + 0],
-                    attribute.vertices[3 * indices[2].vertex_index + 1],
-                    attribute.vertices[3 * indices[2].vertex_index + 2]
+                std::array{
+                    cv::Vec3f{
+                        attribute.vertices[3 * indices[0].vertex_index + 0],
+                        attribute.vertices[3 * indices[0].vertex_index + 1],
+                        attribute.vertices[3 * indices[0].vertex_index + 2]
+                    },
+                    cv::Vec3f{
+                        attribute.vertices[3 * indices[1].vertex_index + 0],
+                        attribute.vertices[3 * indices[1].vertex_index + 1],
+                        attribute.vertices[3 * indices[1].vertex_index + 2]
+                    },
+                    cv::Vec3f{
+                        attribute.vertices[3 * indices[2].vertex_index + 0],
+                        attribute.vertices[3 * indices[2].vertex_index + 1],
+                        attribute.vertices[3 * indices[2].vertex_index + 2]
+                    }
                 },
 
-                cv::Vec3f{
-                    attribute.texcoords[2 * indices[0].texcoord_index + 0],
-                    attribute.texcoords[2 * indices[0].texcoord_index + 1],
-                    0
+                std::array{
+                    cv::Vec3f{
+                        attribute.texcoords[2 * indices[0].texcoord_index + 0],
+                        attribute.texcoords[2 * indices[0].texcoord_index + 1],
+                        0
+                    },
+                    cv::Vec3f{
+                        attribute.texcoords[2 * indices[1].texcoord_index + 0],
+                        attribute.texcoords[2 * indices[1].texcoord_index + 1],
+                        0
+                    },
+                    cv::Vec3f{
+                        attribute.texcoords[2 * indices[2].texcoord_index + 0],
+                        attribute.texcoords[2 * indices[2].texcoord_index + 1],
+                        0
+                    }
                 },
-                cv::Vec3f{
-                    attribute.texcoords[2 * indices[1].texcoord_index + 0],
-                    attribute.texcoords[2 * indices[1].texcoord_index + 1],
-                    0
-                },
-                cv::Vec3f{
-                    attribute.texcoords[2 * indices[2].texcoord_index + 0],
-                    attribute.texcoords[2 * indices[2].texcoord_index + 1],
-                    0
+
+                std::array{
+                    cv::Vec3f{
+                        attribute.normals[3 * indices[0].normal_index + 0],
+                        attribute.normals[3 * indices[0].normal_index + 1],
+                        attribute.normals[3 * indices[0].normal_index + 2]
+                    },
+                    cv::Vec3f{
+                        attribute.normals[3 * indices[1].normal_index + 0],
+                        attribute.normals[3 * indices[1].normal_index + 1],
+                        attribute.normals[3 * indices[1].normal_index + 2]
+                    },
+                    cv::Vec3f{
+                        attribute.normals[3 * indices[2].normal_index + 0],
+                        attribute.normals[3 * indices[2].normal_index + 1],
+                        attribute.normals[3 * indices[2].normal_index + 2]
+                    },
                 }
             );
 

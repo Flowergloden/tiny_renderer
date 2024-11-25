@@ -43,7 +43,6 @@ void Renderer::draw_edge() {
 
 void Renderer::draw_triangle() {
     const cv::Matx44f mvp = projection_matrix.inv() * view_matrix.inv() * model_matrix.inv();
-    // const cv::Matx44f mvp = projection_matrix.inv();
     for (auto& object: model.objects) {
         for (auto& triangle: object.triangles) {
             auto origin_points = triangle.get_points();
@@ -55,31 +54,28 @@ void Renderer::draw_triangle() {
                     cv::Vec3f{
                         pt1[0] / pt1[3],
                         pt1[1] / pt1[3],
-                        pt1[2] / pt1[3]
+                        pt1[2] / pt1[3],
                     },
                     cv::Vec3f{
                         pt2[0] / pt2[3],
                         pt2[1] / pt2[3],
-                        pt2[2] / pt2[3]
+                        pt2[2] / pt2[3],
                     },
                     cv::Vec3f{
                         pt3[0] / pt3[3],
                         pt3[1] / pt3[3],
-                        pt3[2] / pt3[3]
+                        pt3[2] / pt3[3],
                     }
                 },
-                std::array{triangle.get_tex_coors()}
+                std::array{triangle.get_tex_coors()},
+                std::array{triangle.get_normals()},
             };
-            // if (is_perspective) {
-            //     transformed_triangle = triangle.get_perspective_transform(near_distance);
-            // } else {
-            //     transformed_triangle = triangle;
-            // }
-            // BUG: intensity always approach 1 after mvp transform
-            cv::Vec3f n = normalize((transformed_triangle.get_points()[2] - transformed_triangle.get_points()[0]).cross(
-                transformed_triangle.get_points()[1] - transformed_triangle.get_points()[0]));
-            const float intensity = n.dot(light_dir);
-            if (intensity < 0) continue;
+
+            // BUG: some points are unexpectedly skipped
+            if (auto normals = transformed_triangle.get_normals();
+                normals[0].dot(light_dir) < 0 && normals[1].dot(light_dir) < 0 && normals[2].dot(light_dir) < 0) {
+                continue;
+            }
 
             auto bbox = transformed_triangle.get_bounding_box();
             auto left_bottom = world_to_screen(cv::Vec3f{bbox[0][0], bbox[0][1], 0});
@@ -110,10 +106,12 @@ void Renderer::draw_triangle() {
                             static_cast<int>(uv[0] * static_cast<float>(texture.width())),
                             static_cast<int>(uv[1] * static_cast<float>(texture.height())));
 
-                        // // DEBUG ONLY
-                        // const Color color(static_cast<uint8_t>(static_cast<float>(tex_color[2])),
-                        //                   static_cast<uint8_t>(static_cast<float>(tex_color[1])),
-                        //                   static_cast<uint8_t>(static_cast<float>(tex_color[0])));
+                        // interpolation normal
+                        cv::Vec3f n = normalize(transformed_triangle.get_normals()[0] * bc[0] +
+                                                transformed_triangle.get_normals()[1] * bc[1] +
+                                                transformed_triangle.get_normals()[2] * bc[2]);
+                        const float intensity = n.dot(light_dir);
+                        if (intensity < 0) continue;
 
                         const Color color(static_cast<uint8_t>(intensity * static_cast<float>(tex_color[2])),
                                           static_cast<uint8_t>(intensity * static_cast<float>(tex_color[1])),
