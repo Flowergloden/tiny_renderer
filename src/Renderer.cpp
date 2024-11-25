@@ -42,14 +42,46 @@ void Renderer::draw_edge() {
 }
 
 void Renderer::draw_triangle() {
+    const cv::Matx44f mvp = projection_matrix.inv() * view_matrix.inv() * model_matrix.inv();
+    // const cv::Matx44f mvp = projection_matrix.inv();
     for (auto& object: model.objects) {
         for (auto& triangle: object.triangles) {
-            cv::Vec3f n = normalize((triangle.get_points()[2] - triangle.get_points()[0]).cross(
-                triangle.get_points()[1] - triangle.get_points()[0]));
+            auto origin_points = triangle.get_points();
+            cv::Vec4f pt1 = mvp * cv::Vec4f{origin_points[0][0], origin_points[0][1], origin_points[0][2], 1.0f};
+            cv::Vec4f pt2 = mvp * cv::Vec4f{origin_points[1][0], origin_points[1][1], origin_points[1][2], 1.0f};
+            cv::Vec4f pt3 = mvp * cv::Vec4f{origin_points[2][0], origin_points[2][1], origin_points[2][2], 1.0f};
+            Triangle transformed_triangle{
+                std::array{
+                    cv::Vec3f{
+                        pt1[0] / pt1[3],
+                        pt1[1] / pt1[3],
+                        pt1[2] / pt1[3]
+                    },
+                    cv::Vec3f{
+                        pt2[0] / pt2[3],
+                        pt2[1] / pt2[3],
+                        pt2[2] / pt2[3]
+                    },
+                    cv::Vec3f{
+                        pt3[0] / pt3[3],
+                        pt3[1] / pt3[3],
+                        pt3[2] / pt3[3]
+                    }
+                },
+                std::array{triangle.get_tex_coors()}
+            };
+            // if (is_perspective) {
+            //     transformed_triangle = triangle.get_perspective_transform(near_distance);
+            // } else {
+            //     transformed_triangle = triangle;
+            // }
+            // BUG: intensity always approach 1 after mvp transform
+            cv::Vec3f n = normalize((transformed_triangle.get_points()[2] - transformed_triangle.get_points()[0]).cross(
+                transformed_triangle.get_points()[1] - transformed_triangle.get_points()[0]));
             const float intensity = n.dot(light_dir);
             if (intensity < 0) continue;
 
-            auto bbox = triangle.get_bounding_box();
+            auto bbox = transformed_triangle.get_bounding_box();
             auto left_bottom = world_to_screen(cv::Vec3f{bbox[0][0], bbox[0][1], 0});
             auto right_top = world_to_screen(cv::Vec3f{bbox[1][0], bbox[1][1], 0});
             for (int x = left_bottom[0]; x <= right_top[0]; ++x) {
@@ -60,23 +92,28 @@ void Renderer::draw_triangle() {
 
                     // calculate barycentric coordinates with world positon
                     auto p = screen_to_world(cv::Vec3i{x, y, 0});
-                    auto bc = triangle.barycentric(cv::Vec2f{p[0], p[1]});
+                    auto bc = transformed_triangle.barycentric(cv::Vec2f{p[0], p[1]});
                     if (bc[0] < 0 || bc[1] < 0 || bc[2] < 0) { continue; }
 
                     // calculate z value used by z-buffer
                     p[2] = 0;
                     for (int i = 0; i < 3; ++i) {
-                        p[2] += triangle.get_points()[i][2] * bc[i];
+                        p[2] += transformed_triangle.get_points()[i][2] * bc[i];
                     }
 
                     if (z_buffer[y][x] < p[2]) {
                         z_buffer[y][x] = p[2];
                         // interpolation uv
-                        const auto& tex_coors = triangle.get_tex_coors();
+                        const auto& tex_coors = transformed_triangle.get_tex_coors();
                         cv::Vec3f uv = tex_coors[0] * bc[0] + tex_coors[1] * bc[1] + tex_coors[2] * bc[2];
                         const auto tex_color = texture.get(
                             static_cast<int>(uv[0] * static_cast<float>(texture.width())),
                             static_cast<int>(uv[1] * static_cast<float>(texture.height())));
+
+                        // // DEBUG ONLY
+                        // const Color color(static_cast<uint8_t>(static_cast<float>(tex_color[2])),
+                        //                   static_cast<uint8_t>(static_cast<float>(tex_color[1])),
+                        //                   static_cast<uint8_t>(static_cast<float>(tex_color[0])));
 
                         const Color color(static_cast<uint8_t>(intensity * static_cast<float>(tex_color[2])),
                                           static_cast<uint8_t>(intensity * static_cast<float>(tex_color[1])),

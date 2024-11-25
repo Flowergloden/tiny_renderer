@@ -21,6 +21,10 @@ public:
         tex_coors[2] = t2;
     }
 
+    Triangle(const std::array<cv::Vec3f, 3>&& points, const std::array<cv::Vec3f, 3>&& tex_coors): points(points),
+        tex_coors(tex_coors) {
+    }
+
     const std::array<cv::Vec2f, 2>& get_bounding_box();
 
     [[nodiscard]] cv::Vec3f barycentric(const cv::Vec2f& p) const;

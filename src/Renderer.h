@@ -37,6 +37,30 @@ private:
     const cv::Vec3f light_dir = cv::Vec3f{0, 0, -1};
     Image texture;
 
+    // TODO: replace this with complete camera def
+    const float near_distance = 10;
+    const float far_distance = 100;
+    const cv::Matx44f view_matrix{
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    };
+    // TODO: config this
+    bool is_perspective = true;
+    const cv::Matx44f projection_matrix{
+        near_distance, 0, 0, 0,
+        0, near_distance, 0, 0,
+        0, 0, near_distance + far_distance, -near_distance * far_distance,
+        0, 0, 1, 0
+    };
+    const cv::Matx44f model_matrix{
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    };
+
     void draw_edge();
 
     void draw_triangle();
