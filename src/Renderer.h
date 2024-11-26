@@ -34,16 +34,17 @@ private:
     Image img;
     std::vector<std::vector<float>> z_buffer{};
     const int screen_depth = 10;
-    const cv::Vec3f light_dir = normalize(cv::Vec3f{1, 1, 1});
+    const cv::Vec3f light_point = normalize(cv::Vec3f{1, 1, -1});
     Image texture;
 
     // TODO: replace this with complete camera def
+    const cv::Vec3f camera_position{0, 0, 10};
     const float near_distance = 10;
     const float far_distance = 100;
     const cv::Matx44f view_matrix{
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
+        1, 0, 0, camera_position[0],
+        0, 1, 0, camera_position[1],
+        0, 0, 1, camera_position[2],
         0, 0, 0, 1
     };
     // TODO: config this

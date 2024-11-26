@@ -71,9 +71,12 @@ void Renderer::draw_triangle() {
                 std::array{triangle.get_normals()},
             };
 
-            // BUG: some points are unexpectedly skipped
-            if (auto normals = transformed_triangle.get_normals();
-                normals[0].dot(light_dir) < 0 && normals[1].dot(light_dir) < 0 && normals[2].dot(light_dir) < 0) {
+            // back-face culling
+            if (auto normals = transformed_triangle.get_normals(),
+                        points = transformed_triangle.get_points();
+                normals[0].dot(normalize(camera_position - points[0])) < 0
+                && normals[1].dot(normalize(camera_position - points[1])) < 0
+                && normals[2].dot(normalize(camera_position - points[2])) < 0) {
                 continue;
             }
 
@@ -110,7 +113,7 @@ void Renderer::draw_triangle() {
                         cv::Vec3f n = normalize(transformed_triangle.get_normals()[0] * bc[0] +
                                                 transformed_triangle.get_normals()[1] * bc[1] +
                                                 transformed_triangle.get_normals()[2] * bc[2]);
-                        const float intensity = n.dot(light_dir);
+                        const float intensity = n.dot(light_point);
                         if (intensity < 0) continue;
 
                         const Color color(static_cast<uint8_t>(intensity * static_cast<float>(tex_color[2])),
