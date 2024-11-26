@@ -21,6 +21,13 @@ public:
                 z_buffer[i].push_back(0);
             }
         }
+
+        viewport_matrix = cv::Matx44f{
+            static_cast<float>(width) / 2, 0, 0, static_cast<float>(width) / 2,
+            0, static_cast<float>(height) / 2, 0, static_cast<float>(height) / 2,
+            0, 0, screen_depth / 2, screen_depth / 2,
+            0, 0, 0, 1
+        };
     }
 
     void run();
@@ -33,7 +40,7 @@ private:
     Model model;
     Image img;
     std::vector<std::vector<float>> z_buffer{};
-    const int screen_depth = 10;
+    const float screen_depth = 1;
     const cv::Vec3f light_dir = normalize(cv::Vec3f{1, 1, 1}); // use left-hand coordinate system
     Image texture;
 
@@ -73,6 +80,8 @@ private:
         0, 0, 1, 0,
         0, 0, 0, 1
     };
+
+    cv::Matx44f viewport_matrix;
 
     void draw_edge();
 

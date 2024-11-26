@@ -12,19 +12,19 @@ void Renderer::run() {
 }
 
 cv::Vec3i Renderer::world_to_screen(const cv::Vec3f& v) const {
+    cv::Vec4f res = viewport_matrix * cv::Vec4f{v[0], v[1], 1, 1};
+
     return cv::Vec3i{
-        static_cast<int>((v[0] + 1.) * (img.width() - 1.) / 2),
-        static_cast<int>((v[1] + 1.) * (img.height() - 1.) / 2),
-        static_cast<int>((v[2] + 1.) * (screen_depth - 1.) / 2)
+        static_cast<int>(res[0] / res[3]), static_cast<int>(res[1] / res[3]), static_cast<int>(res[2] / res[3])
     };
 }
 
 cv::Vec3f Renderer::screen_to_world(const cv::Vec3i& v) const {
-    return cv::Vec3f{
-        static_cast<float>(v[0] * 2) / static_cast<float>(img.width() - 1.) - 1.f,
-        static_cast<float>(v[1] * 2) / static_cast<float>(img.height() - 1.) - 1.f,
-        static_cast<float>(v[2] * 2) / static_cast<float>(screen_depth - 1.) - 1.f
-    };
+    cv::Vec4f res = viewport_matrix.inv() * cv::Vec4f{
+                        static_cast<float>(v[0]), static_cast<float>(v[1]), static_cast<float>(v[2]), 1
+                    };
+
+    return cv::Vec3f{res[0] / res[3], res[1] / res[3], res[2] / res[3]};
 }
 
 void Renderer::draw_edge() {
