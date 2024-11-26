@@ -70,11 +70,11 @@ void Renderer::draw_triangle() {
                 std::array{triangle.get_tex_coors()},
                 std::array{triangle.get_normals()},
             };
+            auto normals = transformed_triangle.get_normals();
+            auto points = transformed_triangle.get_points();
 
             // back-face culling
-            if (auto normals = transformed_triangle.get_normals(),
-                        points = transformed_triangle.get_points();
-                normals[0].dot(normalize(camera_position - points[0])) < 0
+            if (normals[0].dot(normalize(camera_position - points[0])) < 0
                 && normals[1].dot(normalize(camera_position - points[1])) < 0
                 && normals[2].dot(normalize(camera_position - points[2])) < 0) {
                 continue;
@@ -97,7 +97,7 @@ void Renderer::draw_triangle() {
                     // calculate z value used by z-buffer
                     p[2] = 0;
                     for (int i = 0; i < 3; ++i) {
-                        p[2] += transformed_triangle.get_points()[i][2] * bc[i];
+                        p[2] += points[i][2] * bc[i];
                     }
 
                     if (z_buffer[y][x] < p[2]) {
@@ -110,9 +110,9 @@ void Renderer::draw_triangle() {
                             static_cast<int>(uv[1] * static_cast<float>(texture.height())));
 
                         // interpolation normal
-                        cv::Vec3f n = normalize(transformed_triangle.get_normals()[0] * bc[0] +
-                                                transformed_triangle.get_normals()[1] * bc[1] +
-                                                transformed_triangle.get_normals()[2] * bc[2]);
+                        cv::Vec3f n = normalize(normals[0] * bc[0] +
+                                                normals[1] * bc[1] +
+                                                normals[2] * bc[2]);
                         const float intensity = n.dot(light_point);
                         if (intensity < 0) continue;
 
