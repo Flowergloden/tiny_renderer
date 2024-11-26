@@ -12,7 +12,7 @@ void Renderer::run() {
 }
 
 cv::Vec3i Renderer::world_to_screen(const cv::Vec3f& v) const {
-    cv::Vec4f res = viewport_matrix * cv::Vec4f{v[0], v[1], 1, 1};
+    cv::Vec4f res = viewport_matrix * cv::Vec4f{v[0], v[1], v[2], 1};
 
     return cv::Vec3i{
         static_cast<int>(res[0] / res[3]), static_cast<int>(res[1] / res[3]), static_cast<int>(res[2] / res[3])
@@ -42,6 +42,7 @@ void Renderer::draw_edge() {
 }
 
 void Renderer::draw_triangle() {
+    // BUG: mvp transform should be fixed & reconstructed
     const auto projection_matrix = is_perspective ? orthographic_matrix * perspective_matrix : orthographic_matrix;
     const cv::Matx44f mvp = projection_matrix.inv() * view_matrix.inv() * model_matrix.inv();
     for (auto& object: model.objects) {
@@ -75,9 +76,9 @@ void Renderer::draw_triangle() {
             auto points = transformed_triangle.get_points();
 
             // back-face culling
-            if (normals[0].dot(normalize(points[0] - camera_position)) < 0
-                && normals[1].dot(normalize(points[1] - camera_position)) < 0
-                && normals[2].dot(normalize(points[2] - camera_position)) < 0) {
+            if (normals[0].dot(normalize(points[0] - camera.position)) < 0
+                && normals[1].dot(normalize(points[1] - camera.position)) < 0
+                && normals[2].dot(normalize(points[2] - camera.position)) < 0) {
                 continue;
             }
 
@@ -90,7 +91,7 @@ void Renderer::draw_triangle() {
                 for (int y = left_bottom[1]; y <= right_top[1]; ++y) {
                     if (y < 0 || y >= img.height()) { continue; }
 
-                    // calculate barycentric coordinates with world positon
+                    // calculate barycentric coordinates with world position
                     auto p = screen_to_world(cv::Vec3i{x, y, 0});
                     auto bc = transformed_triangle.barycentric(cv::Vec2f{p[0], p[1]});
                     if (bc[0] < 0 || bc[1] < 0 || bc[2] < 0) { continue; }
@@ -103,24 +104,35 @@ void Renderer::draw_triangle() {
 
                     if (z_buffer[y][x] < p[2]) {
                         z_buffer[y][x] = p[2];
-                        // interpolation uv
-                        const auto& tex_coors = transformed_triangle.get_tex_coors();
-                        cv::Vec3f uv = tex_coors[0] * bc[0] + tex_coors[1] * bc[1] + tex_coors[2] * bc[2];
-                        const auto tex_color = texture.get(
-                            static_cast<int>(uv[0] * static_cast<float>(texture.width())),
-                            static_cast<int>(uv[1] * static_cast<float>(texture.height())));
 
-                        // interpolation normal
-                        cv::Vec3f n = normalize(normals[0] * bc[0] +
-                                                normals[1] * bc[1] +
-                                                normals[2] * bc[2]);
-                        const float intensity = n.dot(light_dir);
-                        if (intensity < 0) continue;
+                        if (print_z_buffer) {
+                            const auto z = (p[2] - camera.near_distance + screen_depth / 2) / screen_depth;
+                            const Color color{
+                                static_cast<uint8_t>(z * 255),
+                                static_cast<uint8_t>(z * 255),
+                                static_cast<uint8_t>(z * 255),
+                            };
+                            img.set(x, y, color);
+                        } else {
+                            // interpolation uv
+                            const auto& tex_coors = transformed_triangle.get_tex_coors();
+                            cv::Vec3f uv = tex_coors[0] * bc[0] + tex_coors[1] * bc[1] + tex_coors[2] * bc[2];
+                            const auto tex_color = texture.get(
+                                static_cast<int>(uv[0] * static_cast<float>(texture.width())),
+                                static_cast<int>(uv[1] * static_cast<float>(texture.height())));
 
-                        const Color color(static_cast<uint8_t>(intensity * static_cast<float>(tex_color[2])),
-                                          static_cast<uint8_t>(intensity * static_cast<float>(tex_color[1])),
-                                          static_cast<uint8_t>(intensity * static_cast<float>(tex_color[0])));
-                        img.set(x, y, color);
+                            // interpolation normal
+                            cv::Vec3f n = normalize(normals[0] * bc[0] +
+                                                    normals[1] * bc[1] +
+                                                    normals[2] * bc[2]);
+                            const float intensity = n.dot(light_dir);
+                            if (intensity < 0) continue;
+
+                            const Color color(static_cast<uint8_t>(intensity * static_cast<float>(tex_color[2])),
+                                              static_cast<uint8_t>(intensity * static_cast<float>(tex_color[1])),
+                                              static_cast<uint8_t>(intensity * static_cast<float>(tex_color[0])));
+                            img.set(x, y, color);
+                        }
                     }
                 }
             }

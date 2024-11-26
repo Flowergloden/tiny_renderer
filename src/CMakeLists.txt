@@ -16,7 +16,9 @@ find_package(OpenCV CONFIG REQUIRED)
 
 add_library(triangle SHARED Triangle.cpp Triangle.h)
 
-add_library(model Model.cpp Model.h)
+add_library(model SHARED Model.cpp Model.h)
+
+add_library(camera SHARED Camera.cpp Camera.h)
 
 if (OpenCV_FOUND)
     include_directories(${OpenCV_INCLUDE_DIRS})
@@ -33,4 +35,4 @@ endif ()
 
 target_link_libraries(model PUBLIC triangle)
 
-target_link_libraries(renderer PUBLIC image model)
+target_link_libraries(renderer PUBLIC image model camera)

@@ -6,21 +6,30 @@
 #define RENDERER_H
 
 #include <tiny_obj_loader.h>
+
+#include <utility>
 #include "Image.h"
 #include "Model.h"
+#include "Camera.h"
 
 class Renderer {
 public:
     // TODO: use .mtl instead texture
-    Renderer(const int width, const int height, const std::string& path): model(path),
-                                                                          img(width, height, Color(0, 0, 0)),
-                                                                          texture("african_head_diffuse.png") {
+    Renderer(const int width, const int height, const std::string& path, Camera camera, bool print_z_buffer = false)
+        : model(path),
+          img(width, height, Color(0, 0, 0)),
+          texture("african_head_diffuse.png"),
+          camera(std::move(camera)),
+          print_z_buffer(print_z_buffer) {
         for (int i = 0; i < height; ++i) {
             z_buffer.emplace_back();
             for (int j = 0; j < width; ++j) {
                 z_buffer[i].push_back(0);
             }
         }
+
+        view_matrix = camera.get_view_matrix();
+        is_perspective = camera.projection_type == Camera::ProjectionType::perspective;
 
         viewport_matrix = cv::Matx44f{
             static_cast<float>(width) / 2, 0, 0, static_cast<float>(width) / 2,
@@ -40,39 +49,34 @@ private:
     Model model;
     Image img;
     std::vector<std::vector<float>> z_buffer{};
-    const float screen_depth = 1;
+    const float screen_depth = 2;
     const cv::Vec3f light_dir = normalize(cv::Vec3f{1, 1, 1}); // use left-hand coordinate system
     Image texture;
+    Camera camera;
+    bool print_z_buffer;
 
-    // TODO: replace this with complete camera def
-    const cv::Vec3f camera_position{0, 0, -1};
-    const float near_distance = 1;
-    const float far_distance = 100;
-    const float top_distance = 1;
-    const float bottom_distance = -1;
-    const float right_distance = 1;
-    const float left_distance = -1;
-    const cv::Matx44f view_matrix{
-        1, 0, 0, camera_position[0],
-        0, 1, 0, camera_position[1],
-        0, 0, 1, camera_position[2],
-        0, 0, 0, 1
-    };
-    // TODO: config this
-    bool is_perspective = true;
+    cv::Matx44f view_matrix;
+    bool is_perspective;
     const cv::Matx44f perspective_matrix{
-        near_distance, 0, 0, 0,
-        0, near_distance, 0, 0,
-        0, 0, near_distance + far_distance, -near_distance * far_distance,
+        camera.near_distance, 0, 0, 0,
+        0, camera.near_distance, 0, 0,
+        0, 0, camera.near_distance + camera.far_distance, -camera.near_distance * camera.far_distance,
         0, 0, 1, 0
     };
 
-    const cv::Matx44f orthographic_matrix{
-        (right_distance - left_distance) / 2, 0, 0, 0,
-        0, (top_distance - bottom_distance) / 2, 0, 0,
-        0, 0, (far_distance - near_distance) / 2, 0,
-        0, 0, 0, 1
-    };
+    const cv::Matx44f orthographic_matrix =
+            cv::Matx44f{
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1,
+            }
+            * cv::Matx44f{
+                camera.width / 2, 0, 0, 0,
+                0, camera.height / 2, 0, 0,
+                0, 0, (camera.far_distance - camera.near_distance) / 2, 0,
+                0, 0, 0, 1
+            };
 
     const cv::Matx44f model_matrix{
         1, 0, 0, 0,
