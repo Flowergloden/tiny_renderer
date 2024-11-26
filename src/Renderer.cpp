@@ -74,9 +74,9 @@ void Renderer::draw_triangle() {
             auto points = transformed_triangle.get_points();
 
             // back-face culling
-            if (normals[0].dot(normalize(camera_position - points[0])) < 0
-                && normals[1].dot(normalize(camera_position - points[1])) < 0
-                && normals[2].dot(normalize(camera_position - points[2])) < 0) {
+            if (normals[0].dot(normalize(points[0] - camera_position)) < 0
+                && normals[1].dot(normalize(points[1] - camera_position)) < 0
+                && normals[2].dot(normalize(points[2] - camera_position)) < 0) {
                 continue;
             }
 
@@ -113,7 +113,7 @@ void Renderer::draw_triangle() {
                         cv::Vec3f n = normalize(normals[0] * bc[0] +
                                                 normals[1] * bc[1] +
                                                 normals[2] * bc[2]);
-                        const float intensity = n.dot(light_point);
+                        const float intensity = n.dot(light_dir);
                         if (intensity < 0) continue;
 
                         const Color color(static_cast<uint8_t>(intensity * static_cast<float>(tex_color[2])),
