@@ -42,6 +42,7 @@ void Renderer::draw_edge() {
 }
 
 void Renderer::draw_triangle() {
+    const auto projection_matrix = is_perspective ? orthographic_matrix * perspective_matrix : orthographic_matrix;
     const cv::Matx44f mvp = projection_matrix.inv() * view_matrix.inv() * model_matrix.inv();
     for (auto& object: model.objects) {
         for (auto& triangle: object.triangles) {

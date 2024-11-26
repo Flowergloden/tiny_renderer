@@ -20,6 +20,7 @@ int main() {
     lineImg.write("line_test.png");
 
     Renderer renderer(4096, 4096, "african_head.obj");
+    // Renderer renderer(4096, 4096, "african_head_moved.obj");
     // Renderer renderer(1024, 1024, "box.obj");
     // Renderer renderer(10, 10, "floor.obj");
     renderer.run();

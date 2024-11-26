@@ -41,6 +41,10 @@ private:
     const cv::Vec3f camera_position{0, 0, -1};
     const float near_distance = 1;
     const float far_distance = 100;
+    const float top_distance = 1;
+    const float bottom_distance = -1;
+    const float right_distance = 1;
+    const float left_distance = -1;
     const cv::Matx44f view_matrix{
         1, 0, 0, camera_position[0],
         0, 1, 0, camera_position[1],
@@ -49,12 +53,20 @@ private:
     };
     // TODO: config this
     bool is_perspective = true;
-    const cv::Matx44f projection_matrix{
+    const cv::Matx44f perspective_matrix{
         near_distance, 0, 0, 0,
         0, near_distance, 0, 0,
         0, 0, near_distance + far_distance, -near_distance * far_distance,
         0, 0, 1, 0
     };
+
+    const cv::Matx44f orthographic_matrix{
+        (right_distance - left_distance) / 2, 0, 0, 0,
+        0, (top_distance - bottom_distance) / 2, 0, 0,
+        0, 0, (far_distance - near_distance) / 2, 0,
+        0, 0, 0, 1
+    };
+
     const cv::Matx44f model_matrix{
         1, 0, 0, 0,
         0, 1, 0, 0,
