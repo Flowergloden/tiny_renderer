@@ -140,12 +140,12 @@ void Renderer::draw_triangle() {
             auto points = transformed_triangle.get_points();
 
             // BUG: some faces unexpectedly culled
-            // // back-face culling
-            // if (normals[0].dot(normalize(points[0] - camera.position)) < 0
-            //     && normals[1].dot(normalize(points[1] - camera.position)) < 0
-            //     && normals[2].dot(normalize(points[2] - camera.position)) < 0) {
-            //     continue;
-            // }
+            // back-face culling
+            if (normals[0].dot(normalize(points[0] - camera.position)) < 0
+                && normals[1].dot(normalize(points[1] - camera.position)) < 0
+                && normals[2].dot(normalize(points[2] - camera.position)) < 0) {
+                continue;
+            }
 
             auto bbox = transformed_triangle.get_bounding_box();
             auto left_bottom = world_to_screen(cv::Vec3f{bbox[0][0], bbox[0][1], 0});
