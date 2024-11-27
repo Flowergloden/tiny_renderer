@@ -51,9 +51,9 @@ public:
         const cv::Vec3f y = z.cross(x);
 
         return cv::Matx44f{
-            x[0], x[1], x[2], position[0],
-            y[0], y[1], y[2], position[1],
-            z[0], z[1], z[2], position[2],
+            x[0], y[0], z[0], position[0],
+            x[1], y[1], z[1], position[1],
+            x[2], y[2], z[2], position[2],
             0, 0, 0, 1
         }.inv();
     }
