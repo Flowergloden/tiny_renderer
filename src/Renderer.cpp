@@ -42,9 +42,8 @@ void Renderer::draw_edge() {
 }
 
 void Renderer::draw_triangle() {
-    // BUG: mvp transform should be fixed & reconstructed
     const auto projection_matrix = is_perspective ? orthographic_matrix * perspective_matrix : orthographic_matrix;
-    const cv::Matx44f mvp = projection_matrix.inv() * view_matrix.inv() * model_matrix.inv();
+    const cv::Matx44f mvp = projection_matrix * view_matrix * model_matrix;
     for (auto& object: model.objects) {
         for (auto& triangle: object.triangles) {
             auto origin_points = triangle.get_points();
