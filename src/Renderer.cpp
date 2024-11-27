@@ -4,6 +4,64 @@
 
 #include "Renderer.h"
 
+Renderer::Renderer(const int width, const int height, const std::string& path, Camera camera, bool print_z_buffer)
+    : model(path),
+      img(width, height, Color(0, 0, 0)),
+      texture("african_head_diffuse.png"),
+      camera(std::move(camera)),
+      print_z_buffer(print_z_buffer) {
+    for (int i = 0; i < height; ++i) {
+        z_buffer.emplace_back();
+        for (int j = 0; j < width; ++j) {
+            z_buffer[i].push_back(0);
+        }
+    }
+
+    view_matrix = camera.get_view_matrix();
+    is_perspective = camera.projection_type == Camera::ProjectionType::perspective;
+
+    viewport_matrix = cv::Matx44f{
+        static_cast<float>(width) / 2, 0, 0, static_cast<float>(width) / 2,
+        0, static_cast<float>(height) / 2, 0, static_cast<float>(height) / 2,
+        0, 0, screen_depth / 2, screen_depth / 2,
+        0, 0, 0, 1
+    };
+
+    const cv::Vec4f left{-camera.width / 2, 0, 0, 1};
+    const cv::Vec4f right{camera.width / 2, 0, 0, 1};
+    const cv::Vec4f top{0, camera.height / 2, 0, 1};
+    const cv::Vec4f bottom{0, -camera.height / 2, 0, 1};
+    const cv::Vec4f near{0, 0, camera.near_distance, 1};
+    const cv::Vec4f far{0, 0, camera.far_distance, 1};
+
+    const auto mv_perspective_matrix = is_perspective
+                                           ? perspective_matrix * view_matrix * model_matrix
+                                           : view_matrix * model_matrix;
+    const float l = (mv_perspective_matrix * left)[0];
+    const float r = (mv_perspective_matrix * right)[0];
+    const float t = (mv_perspective_matrix * top)[1];
+    const float b = (mv_perspective_matrix * bottom)[1];
+    const float n = (mv_perspective_matrix * near)[2];
+    const float f = (mv_perspective_matrix * far)[2];
+
+    orthographic_matrix =
+            cv::Matx44f{
+                2 / (r - l), 0, 0, 0,
+                0, 2 / (t - b), 0, 0,
+                0, 0, 2 / (n - f), 0,
+                0, 0, 0, 1
+            }
+            * cv::Matx44f{
+                1, 0, 0, -(r + l) / 2,
+                0, 1, 0, -(t + b) / 2,
+                0, 0, 1, -(n + f) / 2,
+                0, 0, 0, 1,
+            };
+
+
+    projection_matrix = is_perspective ? perspective_matrix : orthographic_matrix * perspective_matrix;
+}
+
 void Renderer::run() {
     // draw_edge();
     draw_triangle();
@@ -42,7 +100,6 @@ void Renderer::draw_edge() {
 }
 
 void Renderer::draw_triangle() {
-    const auto projection_matrix = is_perspective ? orthographic_matrix * perspective_matrix : orthographic_matrix;
     const cv::Matx44f mvp = projection_matrix * view_matrix * model_matrix;
     for (auto& object: model.objects) {
         for (auto& triangle: object.triangles) {
@@ -74,12 +131,13 @@ void Renderer::draw_triangle() {
             auto normals = transformed_triangle.get_normals();
             auto points = transformed_triangle.get_points();
 
-            // back-face culling
-            if (normals[0].dot(normalize(points[0] - camera.position)) < 0
-                && normals[1].dot(normalize(points[1] - camera.position)) < 0
-                && normals[2].dot(normalize(points[2] - camera.position)) < 0) {
-                continue;
-            }
+            // BUG: some faces unexpectedly culled
+            // // back-face culling
+            // if (normals[0].dot(normalize(points[0] - camera.position)) < 0
+            //     && normals[1].dot(normalize(points[1] - camera.position)) < 0
+            //     && normals[2].dot(normalize(points[2] - camera.position)) < 0) {
+            //     continue;
+            // }
 
             auto bbox = transformed_triangle.get_bounding_box();
             auto left_bottom = world_to_screen(cv::Vec3f{bbox[0][0], bbox[0][1], 0});

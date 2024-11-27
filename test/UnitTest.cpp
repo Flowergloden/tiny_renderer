@@ -19,9 +19,9 @@ int main() {
 
     lineImg.write("line_test.png");
 
-    const Camera camera(120, 1, 5, 100, cv::Vec3f{0, 0, -1});
+    const Camera camera(120, 1, 5, 100, cv::Vec3f{0, 0, 1});
     Renderer renderer(1024, 1024, "african_head.obj", camera);
-    // Renderer renderer(4096, 4096, "african_head_moved.obj");
+    // Renderer renderer(4096, 4096, "african_head_moved.obj", camera);
     // Renderer renderer(1024, 1024, "box.obj");
     // Renderer renderer(10, 10, "floor.obj");
     renderer.run();
