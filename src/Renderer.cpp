@@ -27,7 +27,7 @@ Renderer::Renderer(const int width, const int height, const std::string& path, C
         0, 0, 0, 1
     };
 
-    auto transform_matrix = view_matrix * model_matrix;
+    const auto transform_matrix = view_matrix * model_matrix;
     cv::Vec4f right = transform_matrix * cv::Vec4f{camera.position[0] + camera.width / 2, 0, 0, 1};
     cv::Vec4f left = transform_matrix * cv::Vec4f{camera.position[0] - camera.width / 2, 0, 0, 1};
     cv::Vec4f top = transform_matrix * cv::Vec4f{0, camera.position[1] + camera.height / 2, 0, 1};
@@ -35,12 +35,12 @@ Renderer::Renderer(const int width, const int height, const std::string& path, C
     cv::Vec4f near = transform_matrix * cv::Vec4f{0, 0, camera.position[2] + camera.near_distance, 1};
     cv::Vec4f far = transform_matrix * cv::Vec4f{0, 0, camera.position[2] + camera.far_distance, 1};
 
-    float l = left[0] / left[3];
-    float r = right[0] / right[3];
-    float t = top[1] / top[3];
-    float b = bottom[1] / bottom[3];
-    float n = near[2] / near[3];
-    float f = far[2] / far[3];
+    const float l = left[0] / left[3];
+    const float r = right[0] / right[3];
+    const float t = top[1] / top[3];
+    const float b = bottom[1] / bottom[3];
+    const float n = near[2] / near[3];
+    const float f = far[2] / far[3];
 
     if (is_perspective) {
         perspective_matrix =
@@ -49,21 +49,7 @@ Renderer::Renderer(const int width, const int height, const std::string& path, C
                     0, n, 0, 0,
                     0, 0, n + f, -n * f,
                     0, 0, 1, 0
-                }.inv();
-        transform_matrix = perspective_matrix * transform_matrix;
-        left = perspective_matrix * left;
-        right = perspective_matrix * right;
-        top = perspective_matrix * top;
-        bottom = perspective_matrix * bottom;
-        near = perspective_matrix * near;
-        far = perspective_matrix * far;
-
-        l = left[0] / left[3];
-        r = right[0] / right[3];
-        t = top[1] / top[3];
-        b = bottom[1] / bottom[3];
-        n = near[2] / near[3];
-        f = far[2] / far[3];
+                };
     }
 
     orthographic_matrix =
