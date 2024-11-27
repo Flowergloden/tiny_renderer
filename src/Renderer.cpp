@@ -13,11 +13,11 @@ Renderer::Renderer(const int width, const int height, const std::string& path, C
     for (int i = 0; i < height; ++i) {
         z_buffer.emplace_back();
         for (int j = 0; j < width; ++j) {
-            z_buffer[i].push_back(0);
+            z_buffer[i].push_back(std::numeric_limits<float>::max());
         }
     }
 
-    view_matrix = camera.get_view_matrix().inv();
+    view_matrix = camera.get_view_matrix();
     is_perspective = camera.projection_type == Camera::ProjectionType::perspective;
 
     viewport_matrix = cv::Matx44f{
@@ -51,12 +51,12 @@ Renderer::Renderer(const int width, const int height, const std::string& path, C
                     0, 0, 1, 0
                 }.inv();
         transform_matrix = perspective_matrix * transform_matrix;
-        left = transform_matrix * left;
-        right = transform_matrix * right;
-        top = transform_matrix * top;
-        bottom = transform_matrix * bottom;
-        near = transform_matrix * near;
-        far = transform_matrix * far;
+        left = perspective_matrix * left;
+        right = perspective_matrix * right;
+        top = perspective_matrix * top;
+        bottom = perspective_matrix * bottom;
+        near = perspective_matrix * near;
+        far = perspective_matrix * far;
 
         l = left[0] / left[3];
         r = right[0] / right[3];
@@ -181,7 +181,8 @@ void Renderer::draw_triangle() {
                         p[2] += points[i][2] * bc[i];
                     }
 
-                    if (z_buffer[y][x] < p[2]) {
+                    // we use left-hand coordinate system, which means the smaller the z value, the closer the point
+                    if (z_buffer[y][x] > p[2]) {
                         z_buffer[y][x] = p[2];
 
                         if (print_z_buffer) {

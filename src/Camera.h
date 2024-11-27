@@ -55,7 +55,7 @@ public:
             y[0], y[1], y[2], position[1],
             z[0], z[1], z[2], position[2],
             0, 0, 0, 1
-        };
+        }.inv();
     }
 };
 
