@@ -17,7 +17,7 @@ Renderer::Renderer(const int width, const int height, const std::string& path, C
         }
     }
 
-    view_matrix = camera.get_view_matrix();
+    view_matrix = camera.get_view_matrix().inv();
     is_perspective = camera.projection_type == Camera::ProjectionType::perspective;
 
     viewport_matrix = cv::Matx44f{
@@ -27,22 +27,44 @@ Renderer::Renderer(const int width, const int height, const std::string& path, C
         0, 0, 0, 1
     };
 
-    const cv::Vec4f left{-camera.width / 2, 0, 0, 1};
-    const cv::Vec4f right{camera.width / 2, 0, 0, 1};
-    const cv::Vec4f top{0, camera.height / 2, 0, 1};
-    const cv::Vec4f bottom{0, -camera.height / 2, 0, 1};
-    const cv::Vec4f near{0, 0, camera.near_distance, 1};
-    const cv::Vec4f far{0, 0, camera.far_distance, 1};
+    auto transform_matrix = view_matrix * model_matrix;
+    cv::Vec4f right = transform_matrix * cv::Vec4f{camera.position[0] + camera.width / 2, 0, 0, 1};
+    cv::Vec4f left = transform_matrix * cv::Vec4f{camera.position[0] - camera.width / 2, 0, 0, 1};
+    cv::Vec4f top = transform_matrix * cv::Vec4f{0, camera.position[1] + camera.height / 2, 0, 1};
+    cv::Vec4f bottom = transform_matrix * cv::Vec4f{0, camera.position[1] - camera.height / 2, 0, 1};
+    cv::Vec4f near = transform_matrix * cv::Vec4f{0, 0, camera.position[2] + camera.near_distance, 1};
+    cv::Vec4f far = transform_matrix * cv::Vec4f{0, 0, camera.position[2] + camera.far_distance, 1};
 
-    const auto mv_perspective_matrix = is_perspective
-                                           ? perspective_matrix * view_matrix * model_matrix
-                                           : view_matrix * model_matrix;
-    const float l = (mv_perspective_matrix * left)[0];
-    const float r = (mv_perspective_matrix * right)[0];
-    const float t = (mv_perspective_matrix * top)[1];
-    const float b = (mv_perspective_matrix * bottom)[1];
-    const float n = (mv_perspective_matrix * near)[2];
-    const float f = (mv_perspective_matrix * far)[2];
+    float l = left[0] / left[3];
+    float r = right[0] / right[3];
+    float t = top[1] / top[3];
+    float b = bottom[1] / bottom[3];
+    float n = near[2] / near[3];
+    float f = far[2] / far[3];
+
+    if (is_perspective) {
+        perspective_matrix =
+                cv::Matx44f{
+                    n, 0, 0, 0,
+                    0, n, 0, 0,
+                    0, 0, n + f, -n * f,
+                    0, 0, 1, 0
+                }.inv();
+        transform_matrix = perspective_matrix * transform_matrix;
+        left = transform_matrix * left;
+        right = transform_matrix * right;
+        top = transform_matrix * top;
+        bottom = transform_matrix * bottom;
+        near = transform_matrix * near;
+        far = transform_matrix * far;
+
+        l = left[0] / left[3];
+        r = right[0] / right[3];
+        t = top[1] / top[3];
+        b = bottom[1] / bottom[3];
+        n = near[2] / near[3];
+        f = far[2] / far[3];
+    }
 
     orthographic_matrix =
             cv::Matx44f{

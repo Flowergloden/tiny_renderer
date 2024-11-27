@@ -35,13 +35,7 @@ private:
 
     cv::Matx44f view_matrix;
     bool is_perspective;
-    const cv::Matx44f perspective_matrix =
-            cv::Matx44f{
-                camera.near_distance, 0, 0, 0,
-                0, camera.near_distance, 0, 0,
-                0, 0, camera.near_distance + camera.far_distance, -camera.near_distance * camera.far_distance,
-                0, 0, 1, 0
-            }.inv();
+    cv::Matx44f perspective_matrix;
 
     cv::Matx44f orthographic_matrix;
     cv::Matx44f projection_matrix;
