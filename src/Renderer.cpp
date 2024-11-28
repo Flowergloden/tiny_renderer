@@ -27,20 +27,26 @@ Renderer::Renderer(const int width, const int height, const std::string& path, C
         0, 0, 0, 1
     };
 
-    const auto transform_matrix = view_matrix * model_matrix;
-    cv::Vec4f right = transform_matrix * cv::Vec4f{camera.position[0] + camera.width / 2, 0, 0, 1};
-    cv::Vec4f left = transform_matrix * cv::Vec4f{camera.position[0] - camera.width / 2, 0, 0, 1};
-    cv::Vec4f top = transform_matrix * cv::Vec4f{0, camera.position[1] + camera.height / 2, 0, 1};
-    cv::Vec4f bottom = transform_matrix * cv::Vec4f{0, camera.position[1] - camera.height / 2, 0, 1};
-    cv::Vec4f near = transform_matrix * cv::Vec4f{0, 0, camera.position[2] + camera.near_distance, 1};
-    cv::Vec4f far = transform_matrix * cv::Vec4f{0, 0, camera.position[2] + camera.far_distance, 1};
+    // const auto transform_matrix = view_matrix;
+    cv::Vec4f right = cv::Vec4f{camera.position[0] + camera.width / 2, 0, 0, 1};
+    cv::Vec4f left = cv::Vec4f{camera.position[0] - camera.width / 2, 0, 0, 1};
+    cv::Vec4f top = cv::Vec4f{0, camera.position[1] + camera.height / 2, 0, 1};
+    cv::Vec4f bottom = cv::Vec4f{0, camera.position[1] - camera.height / 2, 0, 1};
+    cv::Vec4f near = cv::Vec4f{0, 0, camera.position[2] + camera.near_distance, 1};
+    cv::Vec4f far = cv::Vec4f{0, 0, camera.position[2] + camera.far_distance, 1};
 
-    const float l = left[0] / left[3];
-    const float r = right[0] / right[3];
-    const float t = top[1] / top[3];
-    const float b = bottom[1] / bottom[3];
-    const float n = near[2] / near[3];
-    const float f = far[2] / far[3];
+    // const float l = left[0] / left[3];
+    const float l = -camera.width;
+    // const float r = right[0] / right[3];
+    const float r = camera.width;
+    // const float t = top[1] / top[3];
+    const float t = camera.height;
+    // const float b = bottom[1] / bottom[3];
+    const float b = -camera.height;
+    // const float n = near[2] / near[3];
+    const float n = camera.near_distance;
+    // const float f = far[2] / far[3];
+    const float f = camera.far_distance;
 
     if (is_perspective) {
         perspective_matrix =
@@ -56,7 +62,7 @@ Renderer::Renderer(const int width, const int height, const std::string& path, C
             cv::Matx44f{
                 2 / (r - l), 0, 0, 0,
                 0, 2 / (t - b), 0, 0,
-                0, 0, 2 / (n - f), 0,
+                0, 0, 2 / (f - n), 0,
                 0, 0, 0, 1
             }
             * cv::Matx44f{
@@ -68,6 +74,15 @@ Renderer::Renderer(const int width, const int height, const std::string& path, C
 
 
     projection_matrix = is_perspective ? perspective_matrix : orthographic_matrix * perspective_matrix;
+
+    // // DEBUG ONLY
+    // const auto final_l = orthographic_matrix * left;
+    // const auto final_r = orthographic_matrix * right;
+    // const auto final_t = orthographic_matrix * top;
+    // const auto final_b = orthographic_matrix * bottom;
+    // const auto final_n = orthographic_matrix * near;
+    // const auto final_f = orthographic_matrix * far;
+    // return;
 }
 
 void Renderer::run() {
@@ -141,9 +156,9 @@ void Renderer::draw_triangle() {
 
             // BUG: some faces unexpectedly culled
             // back-face culling
-            if (normals[0].dot(normalize(points[0] - camera.position)) < 0
-                && normals[1].dot(normalize(points[1] - camera.position)) < 0
-                && normals[2].dot(normalize(points[2] - camera.position)) < 0) {
+            if (normals[0].dot(normalize(points[0] - cv::Vec3f{0, 0, -screen_depth})) < 0
+                && normals[1].dot(normalize(points[1] - cv::Vec3f{0, 0, -screen_depth})) < 0
+                && normals[2].dot(normalize(points[2] - cv::Vec3f{0, 0, -screen_depth})) < 0) {
                 continue;
             }
 

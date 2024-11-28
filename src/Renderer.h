@@ -28,7 +28,7 @@ private:
     Image img;
     std::vector<std::vector<float>> z_buffer{};
     const float screen_depth = 2;
-    const cv::Vec3f light_dir = normalize(cv::Vec3f{1, 1, 1}); // use left-hand coordinate system
+    const cv::Vec3f light_dir = normalize(cv::Vec3f{0, 0, 1}); // use left-hand coordinate system
     Image texture;
     Camera camera;
     bool print_z_buffer;

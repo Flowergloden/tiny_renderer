@@ -44,7 +44,7 @@ public:
     float height;
     float width;
 
-    // BUG: incorrect rotation
+    // BUG: incorrect rotation direction
     [[nodiscard]] cv::Matx44f get_view_matrix() const {
         const cv::Vec3f z = normalize(target_point - position);
         const cv::Vec3f x = normalize(normalize(up).cross(z));
